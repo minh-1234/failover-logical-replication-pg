@@ -1,0 +1,61 @@
+version: '3.1'
+services:
+  postgres-p1:
+    container_name: postgres-p1
+    image: postgres:17.0
+    environment:
+      POSTGRES_USER: "postgresadmin"
+      POSTGRES_PASSWORD: "admin123"
+      POSTGRES_DB: "postgresdb"
+      PGDATA: "/data"
+    volumes:
+      - ./postgres-p1/pgdata:/data
+      - ./postgres-p1/config:/config
+      - ./postgres-p1/archive:/mnt/server/archive
+    command: ["postgres", "-c", "config_file=/config/postgresql.conf"]
+    ports:
+      - 5000:5432
+    networks:
+      - postgres-network-failover
+  
+  postgres-p2:
+    container_name: postgres-p2
+    image: postgres:17.0
+    environment:
+      POSTGRES_USER: "postgresadmin"
+      POSTGRES_PASSWORD: "admin123"
+      POSTGRES_DB: "postgresdb"
+      PGDATA: "/data"
+    volumes:
+      - ./postgres-p2/pgdata:/data
+      - ./postgres-p2/config:/config
+      - ./postgres-p2/archive:/mnt/server/archive
+    command: ["postgres", "-c", "config_file=/config/postgresql.conf"]
+    ports:
+      - 5001:5432
+    depends_on:
+      - postgres-p1
+    networks:
+      - postgres-network-failover
+  
+  postgres-p3:
+    container_name: postgres-p3
+    image: postgres:17.0
+    environment:
+      POSTGRES_USER: "postgresadmin"
+      POSTGRES_PASSWORD: "admin123"
+      POSTGRES_DB: "postgresdb"
+      PGDATA: "/data"
+    volumes:
+      - ./postgres-p3/pgdata:/data
+      - ./postgres-p3/config:/config
+      - ./postgres-p3/archive:/mnt/server/archive
+    command: ["postgres", "-c", "config_file=/config/postgresql.conf"]
+    ports:
+      - 5002:5432
+    networks:
+      - postgres-network-failover
+      
+networks:
+  postgres-network-failover: 
+    driver: bridge
